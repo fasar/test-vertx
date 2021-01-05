@@ -63,9 +63,17 @@ public class App {
 
     private static void startVerticles(Vertx vertx, JsonObject config) {
         // Deploy HTTP Verticle
+        JsonObject httpsConfig = config.getJsonObject("https-server");
+        vertx
+            .deployVerticle("test.vertx.app.HttpsVerticle", new DeploymentOptions().setConfig(httpsConfig))
+            .onSuccess(verticleId -> {
+                System.out.println("HTTPS Verticle deployed with id : " + verticleId);
+            }).onFailure(e -> e.printStackTrace())
+        ;
+
         JsonObject httpConfig = config.getJsonObject("http-server");
         vertx
-            .deployVerticle("test.vertx.app.HttpsVerticle", new DeploymentOptions().setConfig(httpConfig))
+            .deployVerticle("test.vertx.app.HttpVerticle", new DeploymentOptions().setConfig(httpConfig))
             .onSuccess(verticleId -> {
                 System.out.println("HTTP Verticle deployed with id : " + verticleId);
             }).onFailure(e -> e.printStackTrace())
