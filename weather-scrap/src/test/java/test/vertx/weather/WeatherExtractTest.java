@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
+import static test.vertx.weather.WeatherExtract.convertData;
 import static test.vertx.weather.WeatherExtract.extractData;
 
 class WeatherExtractTest {
@@ -26,5 +28,12 @@ class WeatherExtractTest {
         Document doc = Jsoup.parse(in, "UTF8");
         List<List<String>> res = extractData(doc);
         Assertions.assertEquals(49, res.size());
+
+        List<WeatherSignal> weatherSignals = convertData(res, Instant.parse("2021-01-01T00:00:00.000Z"));
+        Assertions.assertEquals(9,weatherSignals.size());
+        Assertions.assertEquals(48,weatherSignals.get(0).getData().size());
+
     }
+
+
 }
