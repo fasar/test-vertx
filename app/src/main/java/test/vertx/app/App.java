@@ -65,7 +65,7 @@ public class App {
         // Deploy HTTP Verticle
         JsonObject httpConfig = config.getJsonObject("http-server");
         vertx
-            .deployVerticle("test.vertx.app.HttpVerticle", new DeploymentOptions().setConfig(httpConfig))
+            .deployVerticle("test.vertx.app.HttpsVerticle", new DeploymentOptions().setConfig(httpConfig))
             .onSuccess(verticleId -> {
                 System.out.println("HTTP Verticle deployed with id : " + verticleId);
             }).onFailure(e -> e.printStackTrace())

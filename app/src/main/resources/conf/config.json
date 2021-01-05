@@ -2,7 +2,14 @@
     "name" : "Application Name",
     "version" : "1.0",
     "http-server" : {
-        "config": {"port":  7854},
+        "config": {
+            "port":  8443,
+            "ssl": true,
+            "keyStoreOptions": {
+                "password": "myStorePass",
+                "path": "certificates.keystore"
+            }
+        },
         "message" : "Hello from Vertx + Config 7"
     }
 }
