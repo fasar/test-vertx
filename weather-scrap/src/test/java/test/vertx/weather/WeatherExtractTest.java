@@ -13,10 +13,18 @@ import static test.vertx.weather.WeatherExtract.extractData;
 
 class WeatherExtractTest {
     @Test
-    void testExtractWeather() throws IOException {
-        File in = new File("src/test/resources/test/vertx/weather/pageSource.html");
+    void testExtractWeather1() throws IOException {
+        File in = new File("src/test/resources/test/vertx/weather/pageSource20210104.html");
         Document doc = Jsoup.parse(in, "UTF8");
         List<List<String>> res = extractData(doc);
         Assertions.assertEquals(30, res.size());
+    }
+
+    @Test
+    void testExtractWeather2() throws IOException {
+        File in = new File("src/test/resources/test/vertx/weather/pageSource20210101.html");
+        Document doc = Jsoup.parse(in, "UTF8");
+        List<List<String>> res = extractData(doc);
+        Assertions.assertEquals(49, res.size());
     }
 }

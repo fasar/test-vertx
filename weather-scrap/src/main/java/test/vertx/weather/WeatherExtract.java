@@ -36,7 +36,6 @@ public class WeatherExtract {
             res.add(res2);
             for (Element datum : data) {
                 res2.add(datum.text());
-                System.out.println(datum.text());
             }
         }
         return res;
