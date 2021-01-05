@@ -1,0 +1,8 @@
+{
+    "name" : "Application Name",
+    "version" : "1.0",
+    "http-server" : {
+        "config": {"port":  7854},
+        "message" : "Hello from Vertx + Config 7"
+    }
+}

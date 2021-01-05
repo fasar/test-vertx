@@ -1,6 +1,0 @@
-{
-    "name" : "Application Name",
-    "version" : "1.0",
-    "port": 7854,
-    "message" : "Hello from Vertx + Config 4"
-}

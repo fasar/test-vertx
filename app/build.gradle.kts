@@ -7,9 +7,11 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":utilities"))
-    implementation("io.vertx:vertx-config:4.0.0")
+    val vertxVersion = "4.0.0"
 
+    implementation(project(":utilities"))
+    implementation("io.vertx:vertx-config:${vertxVersion}")
+    implementation("io.vertx:vertx-web:${vertxVersion}")
 }
 
 application {

@@ -3,24 +3,33 @@ package test.vertx.app;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
 
 public class HttpVerticle extends AbstractVerticle {
     private HttpServer server;
 
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
-        Integer port = config().getInteger("port");
-
-        server = vertx.createHttpServer().requestHandler(req -> {
-            req.response()
-                .putHeader("content-type", "text/plain")
-                .end(config().getString("message"));
-        });
-
+        Router router = Router.router(vertx);
+        router.get("/api/message")
+            .handler(rc -> {
+                String message = config().getString("message");
+                rc.response().end(message);
+            });
+        router.get().handler(StaticHandler
+            .create().setAllowRootFileSystemAccess(true).setDirectoryListing(true)
+            .setWebRoot("/home/sartor/work/Sandbox/Java/test-vertx/app/src/main/resources/conf")
+        );
+        //router.get().handler(StaticHandler.create());
+        HttpServerOptions httpServerOptions = new HttpServerOptions(config().getJsonObject("config"));
+        server = vertx.createHttpServer(httpServerOptions).requestHandler(router);
         // Now bind the server:
-        server.listen(port, res -> {
+        server.listen(res -> {
             if (res.succeeded()) {
                 startPromise.complete();
+                System.out.println("HTTP Server listen on " + config().getJsonObject("config").getInteger("port"));
             } else {
                 startPromise.fail(res.cause());
             }

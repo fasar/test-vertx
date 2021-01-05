@@ -7,40 +7,68 @@ import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
+import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
-
+        FileSystem fs = vertx.fileSystem();
         ConfigStoreOptions fileStore = new ConfigStoreOptions()
             .setType("file")
-            .setConfig(new JsonObject().put("path", "my-config.json"));
-        ConfigStoreOptions sysPropsStore = new ConfigStoreOptions().setType("sys");
+            .setConfig(new JsonObject().put("path", "conf/config.json"));
+
         ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-            .setScanPeriod(2000)
-            .addStore(fileStore); //.addStore(sysPropsStore);
+            .setScanPeriod(1000)
+            .addStore(fileStore);
 
         ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
+        // Force to read configuration
         retriever.getConfig(ar -> {
             if (ar.failed()) {
                 // Failed to retrieve the configuration
                 ar.cause().printStackTrace();
             } else {
                 JsonObject config = ar.result();
-                vertx.deployVerticle("test.vertx.app.HttpVerticle", new DeploymentOptions().setConfig(config));
                 System.out.println("Loaded Config is : " + config);
             }
         });
 
-        retriever.listen(change -> {
-            JsonObject json = change.getNewConfiguration();
-            System.out.println("New configuration detected " + json);
-        });
+        retriever.configStream()
+            .endHandler(v -> {
+                // retriever closed
+                System.out.println("Configuration closed ");
+            })
+            .exceptionHandler(t -> {
+                // an error has been caught while retrieving the configuration
+                System.out.println("Configuration error ");
+                t.printStackTrace();
+            })
+            .handler(conf -> {
+                // the configuration
+                System.out.println("Configuration changed:" + conf);
+                System.out.println("Terminate verticles");
+                List<Future<Void>> toWait = vertx.deploymentIDs().stream().map(vertx::undeploy).collect(Collectors.toList());
+                System.out.println(toWait.size() + " verticles ended");
+                System.out.println("Starting verticles");
+                startVerticles(vertx, conf);
+            });
+    }
 
-
+    private static void startVerticles(Vertx vertx, JsonObject config) {
+        // Deploy HTTP Verticle
+        JsonObject httpConfig = config.getJsonObject("http-server");
+        vertx
+            .deployVerticle("test.vertx.app.HttpVerticle", new DeploymentOptions().setConfig(httpConfig))
+            .onSuccess(verticleId -> {
+                System.out.println("HTTP Verticle deployed with id : " + verticleId);
+            }).onFailure(e -> e.printStackTrace())
+        ;
     }
 }
