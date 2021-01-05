@@ -8,4 +8,4 @@
  */
 
 rootProject.name = "test-vertx"
-include("app", "list", "utilities")
+include("app", "weather-scrap", "utilities")
