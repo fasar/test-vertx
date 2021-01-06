@@ -69,17 +69,6 @@ public class VertxWarp10 {
                 System.out.println("Starting verticles");
                 startVerticles(vertx, conf);
             });
-    }
-
-    private static void startVerticles(Vertx vertx, JsonObject config) {
-        // Deploy HTTP Verticle
-        JsonObject warp10Config = config.getJsonObject("warp10");
-        vertx
-            .deployVerticle("test.vertx.tsdb.Warp10Verticle", new DeploymentOptions().setConfig(warp10Config))
-            .onSuccess(verticleId -> {
-                System.out.println("Warp10 Verticle deployed with id : " + verticleId);
-            }).onFailure(e -> e.printStackTrace())
-        ;
 
         List<String> data = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
@@ -92,5 +81,16 @@ public class VertxWarp10 {
             System.out.println("Write to " + obj.getSignalName());
             vertx.eventBus().send("tsdb.data", Json.encode(obj));
         });
+    }
+
+    private static void startVerticles(Vertx vertx, JsonObject config) {
+        // Deploy HTTP Verticle
+        JsonObject warp10Config = config.getJsonObject("warp10");
+        vertx
+            .deployVerticle("test.vertx.tsdb.Warp10Verticle", new DeploymentOptions().setConfig(warp10Config))
+            .onSuccess(verticleId -> {
+                System.out.println("Warp10 Verticle deployed with id : " + verticleId);
+            }).onFailure(e -> e.printStackTrace())
+        ;
     }
 }
