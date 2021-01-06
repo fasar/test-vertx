@@ -1,8 +1,15 @@
 
 
+
 allprojects {
     apply plugin: "java"
+
+    repositories {
+        jcenter()
+    }
+
     dependencies {
+        compileOnly("org.slf4j:slf4j-api:1.7.25")
 
         compileOnly("org.projectlombok:lombok:1.18.16")
         annotationProcessor("org.projectlombok:lombok:1.18.16")

@@ -17,12 +17,18 @@ public class WeatherExtract {
     public static void main(String[] args) throws IOException {
         Document doc = Jsoup.parse(new File("pageSource.html"), "UTF8");
         List<List<String>> res = extractData(doc);
-        convertData(res, Instant.parse("2020-01-01T00:00:00Z"));
+        List<WeatherSignal> weatherSignals = convertData(res, Instant.parse("2020-01-01T00:00:00Z"));
         System.out.println("The final Is :");
-        System.out.println(res);
+        System.out.println(weatherSignals);
 
     }
 
+    /**
+     * Extract row data from HTML page in the Document argument
+     *
+     * @param doc
+     * @return
+     */
     public static List<List<String>> extractData(Document doc) {
         List<List<String>> res = new ArrayList<>();
         Element select = doc.select(".observation-table").first();
@@ -45,6 +51,12 @@ public class WeatherExtract {
         return res;
     }
 
+    /**
+     * Convert the argument in List of signal.
+     * @param data
+     * @param startInstant
+     * @return
+     */
     public static List<WeatherSignal> convertData(List<List<String>> data, Instant startInstant) {
         Objects.requireNonNull(data, "Data should not be null");
         Objects.requireNonNull(startInstant, "Start Instant should not be null");
@@ -72,5 +84,15 @@ public class WeatherExtract {
             }
         }
         return res;
+    }
+
+    /**
+     * Convert the signal in
+     *
+     * @param signalName
+     * @param inputs
+     */
+    public static void convertSignal(String signalName, List<String> inputs) {
+
     }
 }

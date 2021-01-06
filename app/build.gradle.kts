@@ -8,11 +8,18 @@ plugins {
 
 dependencies {
     val vertxVersion = "4.0.0"
+    implementation("org.apache.commons:commons-lang3:3.11")
+
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.0")
 
     implementation(project(":model"))
     implementation(project(":weather-scrap"))
     implementation("io.vertx:vertx-config:${vertxVersion}")
     implementation("io.vertx:vertx-web:${vertxVersion}")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.0")
 }
 
 application {

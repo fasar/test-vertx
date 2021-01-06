@@ -8,10 +8,11 @@ plugins {
 
 dependencies {
     implementation(project(":model"))
-
+    implementation("org.apache.commons:commons-lang3:3.11")
     implementation("org.seleniumhq.selenium:selenium-java:3.141.59")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:3.141.59")
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("commons-io:commons-io:2.8.0")
+    implementation("org.apache.commons:commons-lang3:3.11")
 }

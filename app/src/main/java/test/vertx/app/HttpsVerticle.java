@@ -4,24 +4,13 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
 public class HttpsVerticle extends AbstractVerticle {
     private HttpServer server;
 
-    public static void main(String[] args) {
-        HttpServerOptions httpServerOptions = new HttpServerOptions();
-        httpServerOptions.setSsl(true)
-                .setKeyStoreOptions(
-            new JksOptions()
-                .setPath("certificates.keystore")   // (2)
-                .setPassword("localhost")           // (3)
-        );
-        System.out.println(httpServerOptions.toJson());
 
-    }
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         Router router = Router.router(vertx);
