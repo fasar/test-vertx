@@ -42,7 +42,7 @@ public class HttpsVerticle extends AbstractVerticle {
         server.listen(res -> {
             if (res.succeeded()) {
                 startPromise.complete();
-                System.out.println("HTTPS Server listen on " + config().getJsonObject("config").getInteger("port"));
+                System.out.println("HTTP Server listen on " + config().getJsonObject("config").getInteger("port"));
             } else {
                 startPromise.fail(res.cause());
             }

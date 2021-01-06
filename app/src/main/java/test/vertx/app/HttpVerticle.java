@@ -24,7 +24,7 @@ public class HttpVerticle extends AbstractVerticle {
                     url = new URL("https", url.getHost(), config().getInteger("port-ssl"), url.getFile());
                 } catch (MalformedURLException e) {
                     r.response().setStatusCode(404)
-                        .end("HTTPS is not available");
+                        .end("HTTP is not available");
                 }
 
                 r.response()

@@ -1,10 +1,10 @@
 {
     "name": "Application Name",
     "version": "1.0",
-    "https-server": {
+    "http-server": {
         "config": {
-            "port": 8443,
-            "ssl": true,
+            "port": 8080,
+            "ssl": false,
             "keyStoreOptions": {
                 "password": "myStorePass",
                 "path": "certificates.keystore"
@@ -12,10 +12,11 @@
         },
         "message": "Hello from Vertx + Config 7"
     },
-    "http-server": {
+    "http-redirect": {
         "config": {
             "port": 8080
         },
+        "enable" : false,
         "port-ssl": 8443
     }
 }
