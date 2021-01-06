@@ -17,6 +17,7 @@ public class WeatherExtract {
     public static void main(String[] args) throws IOException {
         Document doc = Jsoup.parse(new File("pageSource.html"), "UTF8");
         List<List<String>> res = extractData(doc);
+        convertData(res, Instant.parse("2020-01-01T00:00:00Z"));
         System.out.println("The final Is :");
         System.out.println(res);
 

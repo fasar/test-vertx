@@ -9,7 +9,8 @@ plugins {
 dependencies {
     val vertxVersion = "4.0.0"
 
-    implementation(project(":utilities"))
+    implementation(project(":model"))
+    implementation(project(":weather-scrap"))
     implementation("io.vertx:vertx-config:${vertxVersion}")
     implementation("io.vertx:vertx-web:${vertxVersion}")
 }

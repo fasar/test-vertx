@@ -7,6 +7,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":model"))
+
     implementation("org.seleniumhq.selenium:selenium-java:3.141.59")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:3.141.59")
