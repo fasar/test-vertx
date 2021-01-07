@@ -10,7 +10,7 @@ import java.util.List;
 @Value
 @AllArgsConstructor
 public class WeatherSignal {
-    public String name;
+    public String observationName; // The name of the Signal. Can be Temperature, Dew Point, Wind, Wind Speed, Wind Gust, Pressure, Condition
     public Instant startInstant;
     public Duration step;
     public List<String> data;

@@ -17,7 +17,6 @@ import static java.time.temporal.ChronoField.*;
 
 public class WeatherAccess {
     static final DateTimeFormatter DATE_FORMATTER;
-
     static {
         DATE_FORMATTER = new DateTimeFormatterBuilder()
             .appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
@@ -28,24 +27,33 @@ public class WeatherAccess {
             .toFormatter();
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    private WebDriver driver;
+
+    public WeatherAccess() {
         System.setProperty("webdriver.gecko.driver", "/usr/bin/geckodriver");
         System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         ChromeOptions options = new ChromeOptions();
         options.setHeadless(true);
-        WebDriver driver = new ChromeDriver(options);
+        driver = new ChromeDriver(options);
+    }
 
+    public static void main(String[] args) throws InterruptedException, IOException {
+        WeatherAccess weatherAccess = new WeatherAccess();
         File file = new File("pageSource.html");
-        String pageSource = getWeather(driver, "LFLP", LocalDate.of(2021, 1, 1));
+        String pageSource = weatherAccess.getWeather("LFLP", LocalDate.of(2021, 1, 1));
         FileUtils.writeStringToFile(file, pageSource, StandardCharsets.UTF_8);
+    }
+
+    public void closeDriver() {
         driver.quit();
     }
 
-    private static String getWeather(WebDriver driver, String city, LocalDate date) throws InterruptedException {
+
+    public String getWeather(String city, LocalDate date) throws InterruptedException {
         String dateStr = date.format(DATE_FORMATTER);
         String url = String.format("https://www.wunderground.com/history/daily/%s/date/%s", city, dateStr);
         driver.get(url);
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         String pageSource = driver.getPageSource();
         return pageSource;
     }

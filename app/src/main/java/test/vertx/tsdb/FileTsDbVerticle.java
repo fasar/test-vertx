@@ -62,18 +62,12 @@ public class FileTsDbVerticle extends AbstractVerticle {
                     startPromise.fail(hr.cause());
                 }
             });
-        // Set the result to fail or ok depending of the chain of the
-//            .result()
-//            .onComplete(asyncResult -> {
-//                startPromise.handle(asyncResult);
-//            });
-//
-
     }
 
     private void onNewMessage(io.vertx.core.eventbus.Message<String> message) {
         TsDbRecord tsDbRecord = Json.decodeValue(message.body(), TsDbRecord.class);
         String warp10WSMessage = Warp10Utils.convertTsDbRecordToWSGTS(tsDbRecord);
+        LOG.debug("# Receive a message for : {} {}", tsDbRecord.getSignalName(), tsDbRecord.getLabels());
         LOG.info(warp10WSMessage);
     }
 

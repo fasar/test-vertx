@@ -4,6 +4,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,13 +16,32 @@ import java.util.List;
 import java.util.Objects;
 
 public class WeatherExtract {
-    public static void main(String[] args) throws IOException {
-        Document doc = Jsoup.parse(new File("pageSource.html"), "UTF8");
-        List<List<String>> res = extractData(doc);
-        List<WeatherSignal> weatherSignals = convertData(res, Instant.parse("2020-01-01T00:00:00Z"));
-        System.out.println("The final Is :");
-        System.out.println(weatherSignals);
+    private static Logger LOG = LoggerFactory.getLogger(WeatherExtract.class);
 
+    private Document doc;
+
+    public WeatherExtract(String html) {
+        doc = Jsoup.parse(html);
+    }
+    public WeatherExtract(File file) throws IOException {
+        doc = Jsoup.parse(file, "UTF8");
+    }
+
+    public static void main(String[] args) throws IOException {
+        WeatherExtract weatherExtract = new WeatherExtract(new File("weather-scrap/src/test/resources/test/vertx/weather/pageSource20210101.html"));
+
+        if (weatherExtract.titleContains("Annecy")) {
+            System.out.println("The document is for the Annecy");
+        }
+        if (weatherExtract.titleContains("New York")) {
+            System.out.println("The document is not for the Now York");
+        }
+        List<WeatherSignal> convert = weatherExtract.convert(Instant.parse("2020-01-01T00:00:00Z"));
+        System.out.println("The final Is :");
+        for (WeatherSignal weatherSignal : convert) {
+            System.out.printf("  signal : %s - First data %s%n", weatherSignal.getObservationName(), weatherSignal.getData().get(0));
+        }
+        //System.out.println(convert);
     }
 
     /**
@@ -29,7 +50,7 @@ public class WeatherExtract {
      * @param doc
      * @return
      */
-    public static List<List<String>> extractData(Document doc) {
+    static List<List<String>> extractData(Document doc) {
         List<List<String>> res = new ArrayList<>();
         Element select = doc.select(".observation-table").first();
         Element table = select.select("table").first();
@@ -57,7 +78,7 @@ public class WeatherExtract {
      * @param startInstant
      * @return
      */
-    public static List<WeatherSignal> convertData(List<List<String>> data, Instant startInstant) {
+    static List<WeatherSignal> convertData(List<List<String>> data, Instant startInstant) {
         Objects.requireNonNull(data, "Data should not be null");
         Objects.requireNonNull(startInstant, "Start Instant should not be null");
         if (data.size() < 1) {
@@ -86,13 +107,19 @@ public class WeatherExtract {
         return res;
     }
 
-    /**
-     * Convert the signal in
-     *
-     * @param signalName
-     * @param inputs
-     */
-    public static void convertSignal(String signalName, List<String> inputs) {
-
+    public boolean titleContains(String cityName) {
+        if (cityName == null) {
+            return false;
+        }
+        Elements select = doc.select(".city-header");
+        String text = select.text();
+        return text.toLowerCase().contains(cityName.toLowerCase());
     }
+
+    public List<WeatherSignal> convert(Instant startInstant) {
+        List<List<String>> res = extractData(doc);
+        List<WeatherSignal> weatherSignals = convertData(res, startInstant);
+        return weatherSignals;
+    }
+
 }

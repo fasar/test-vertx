@@ -22,7 +22,7 @@ public class Warp10Utils {
         StringBuilder sb = new StringBuilder();
         String signalName = record.getSignalName();
         long l = record.getStartInstant().toEpochMilli();
-        sb.append(l);
+        sb.append(l * 1000);
         sb.append("// ");
         sb.append(record.getSignalName());
         String labels = null;
@@ -40,7 +40,7 @@ public class Warp10Utils {
         for (int i = 1; i < data.size(); i++) {
             l = l + record.getStepDuration().toMillis();
             sb.append("=");
-            sb.append(l);
+            sb.append(l * 1000);
             sb.append("// ");
             sb.append(toUnint(data.get(i), record.getUnit()));
             sb.append("\n");

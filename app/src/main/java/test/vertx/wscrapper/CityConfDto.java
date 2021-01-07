@@ -1,14 +1,16 @@
-package test.vertx.tsdb;
+package test.vertx.wscrapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-public class TsDbLabel {
-    String key;
-    String value;
+public class CityConfDto {
+    String name;
+    String anagram;
+    String zoneId;
+    String htmlTitleKey;
 }

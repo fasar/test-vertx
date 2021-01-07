@@ -16,21 +16,70 @@
         "config": {
             "port": 8080
         },
-        "enable" : false,
+        "enable": false,
         "port-ssl": 8443
     },
-    "warp10" : {
-        "host-uri" : "http://localhost:8080/api/v0/streamupdate",
-        "reconnect-delay" : 5000,
+    "warp10": {
+        "host-uri": "http://localhost:8080/api/v0/streamupdate",
+        "reconnect-delay": 5000,
         "warp10-token": "writeTokenCI",
         "debug-ws": false
     },
-    "tsdb-file" : {
-        "config-file" : "conf/loggts.xml"
+    "tsdb-file": {
+        "config-file": "conf/loggts.xml",
+        "output-file": "data/gts.log"
     },
     "weather-scrapper": {
-        "cities-names": ["Annecy", "Geneve", "Lyon", "Canberra", "Bangalore", "Kuala Lumpur", "Doha", "Sydney", "Bangkok"],
-        "cities-anagrams": ["LFLP", "LSGG", "LFLL", "YSCB", "VOBL", "WMKK", "OTBD", "SYHD", "VTBD"],
-        "nb-days" : 1
+        "html-scraped-folder": "data-scrapped",
+        "nb-days-to-scrap": 10,
+        "cities": [
+            {
+                "name": "Annecy",
+                "anagram": "LFLP",
+                "zoneId": "Europe/Paris"
+            },
+            {
+                "name": "Geneve",
+                "htmlTitleKey": "Geneva",
+                "anagram": "LSGG",
+                "zoneId": "Europe/Zurich"
+            },
+            {
+                "name": "Lyon",
+                "anagram": "LFLL",
+                "zoneId": "Europe/Paris"
+            },
+            {
+                "name": "Canberra",
+                "anagram": "YSCB",
+                "zoneId": "Australia/Canberra"
+            },
+            {
+                "name": "Bangalore",
+                "anagram": "VOBL",
+                "zoneId": "Asia/Calcutta"
+            },
+            {
+                "name": "Kuala Lumpur",
+                "htmlTitleKey": "Sepang",
+                "anagram": "WMKK",
+                "zoneId": "Asia/Kuala_Lumpur"
+            },
+            {
+                "name": "Doha",
+                "anagram": "OTBD",
+                "zoneId": "Asia/Qatar"
+            },
+            {
+                "name": "Sydney",
+                "anagram": "SYHD",
+                "zoneId": "Australia/Sydney"
+            },
+            {
+                "name": "Bangkok",
+                "anagram": "VTBD",
+                "zoneId": "Asia/Bangkok"
+            }
+        ]
     }
 }
