@@ -11,15 +11,14 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.http.WebSocketConnectOptions;
 import io.vertx.core.json.Json;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import test.vertx.utilities.Warp10Utils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Warp10Verticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(Warp10Verticle.class);
@@ -37,7 +36,7 @@ public class Warp10Verticle extends AbstractVerticle {
         DeliveryOptions options = new DeliveryOptions().setSendTimeout(100);
         consumer = eventBus.consumer("tsdb.data", message -> {
             TsDbRecord tsDbRecord = Json.decodeValue(message.body(), TsDbRecord.class);
-            String warp10WSMessage = convertTsDbRecordToWSMessage(tsDbRecord);
+            String warp10WSMessage = Warp10Utils.convertTsDbRecordToWSGTS(tsDbRecord);
             eventBus.request("tsdb.data.private", warp10WSMessage, options, ar -> {
                 if (ar.failed()) {
                     toWrite.add(message.body());
@@ -49,50 +48,6 @@ public class Warp10Verticle extends AbstractVerticle {
         });
     }
 
-    String convertTsDbRecordToWSMessage(TsDbRecord record) {
-        List<String> data = record.getData();
-        if (data.size() == 0) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        String signalName = record.getSignalName();
-        long l = record.getStartInstant().toEpochMilli();
-        sb.append(l);
-        sb.append("// ");
-        sb.append(record.signalName);
-        String labels = null;
-        if (record.labels != null) {
-            labels = record.labels.stream().map(lab -> lab.key + "=" + lab.value).collect(Collectors.joining(",", "{", "}"));
-        }
-        if (StringUtils.isBlank(labels)) {
-            sb.append("{}");
-        } else {
-            sb.append(labels);
-        }
-        sb.append(" ");
-        sb.append(toUnint(data.get(0), record.unit));
-        sb.append("\n");
-        for (int i = 1; i < data.size(); i++) {
-            l = l + record.stepDuration.toMillis();
-            sb.append("=");
-            sb.append(l);
-            sb.append("// ");
-            sb.append(toUnint(data.get(i), record.unit));
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    private String toUnint(String data, TsDbUnit unit) {
-        switch (unit) {
-            case STRING:
-                return "'" + data.replace("'", "\\'") + "'";
-            case NUMBER:
-            case BOOLEAN:
-            default:
-                return data;
-        }
-    }
 
     @Override
     public void stop(Promise<Void> stopPromise) throws Exception {
@@ -136,16 +91,7 @@ public class Warp10Verticle extends AbstractVerticle {
                         }
                     });
                     ws.closeHandler(hdl -> {
-                        client.close();
-                        client = null;
-                        if (running) {
-                            LOG.info("The websocket is closed, try to open it again in {} ms", reconnectDelay);
-                            try {
-                                openWebsocket(reconnectDelay);
-                            } catch (Exception e) {
-                                // Not Possible
-                            }
-                        }
+                        tryToOpenLater("closed", reconnectDelay);
                     });
                     // Write the token for Warp10
                     writeWS(ws, "ONERROR MESSAGE");
@@ -168,17 +114,7 @@ public class Warp10Verticle extends AbstractVerticle {
 
                     LOG.info("Websocked Connected on {}", hostUri);
                 } else {
-                    client.close();
-                    client = null;
-                    LOG.error("Can't connected websocket on {}", hostUri);
-                    if (running) {
-                        LOG.info("The websocket was not open, try to open it again in {}", reconnectDelay, res.cause());
-                        try {
-                            openWebsocket(reconnectDelay);
-                        } catch (Exception e) {
-                            // Not Possible
-                        }
-                    }
+                    tryToOpenLater("not open", reconnectDelay);
                 }
             });
         };
@@ -186,6 +122,21 @@ public class Warp10Verticle extends AbstractVerticle {
             vertx.setTimer(delay, openClient);
         } else {
             openClient.handle(0L);
+        }
+    }
+
+    private void tryToOpenLater(String raison, Long reconnectDelay) {
+        if (client != null) {
+            client.close();
+            client = null;
+        }
+        if (running) {
+            LOG.info("The websocket was {}, try to open it again in {} ms", raison, reconnectDelay);
+            try {
+                openWebsocket(reconnectDelay);
+            } catch (Exception e) {
+                // Not Possible
+            }
         }
     }
 

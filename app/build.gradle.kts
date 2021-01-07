@@ -8,7 +8,6 @@ plugins {
 
 dependencies {
     val vertxVersion = "4.0.0"
-    implementation("org.apache.commons:commons-lang3:3.11")
 
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.0")

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class VertxWarp10 {
+public class VertxTsDbApp {
 
     public static void main(String[] args) {
         // Configure jackson
@@ -90,6 +90,13 @@ public class VertxWarp10 {
             .deployVerticle("test.vertx.tsdb.Warp10Verticle", new DeploymentOptions().setConfig(warp10Config))
             .onSuccess(verticleId -> {
                 System.out.println("Warp10 Verticle deployed with id : " + verticleId);
+            }).onFailure(e -> e.printStackTrace())
+        ;
+        JsonObject fileTsdbConf = config.getJsonObject("warp10");
+        vertx
+            .deployVerticle("test.vertx.tsdb.FileTsDbVerticle", new DeploymentOptions().setConfig(fileTsdbConf))
+            .onSuccess(verticleId -> {
+                System.out.println("FileTsDb Verticle deployed with id : " + verticleId);
             }).onFailure(e -> e.printStackTrace())
         ;
     }
