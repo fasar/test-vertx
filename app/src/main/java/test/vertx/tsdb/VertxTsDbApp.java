@@ -78,8 +78,8 @@ public class VertxTsDbApp {
         Random ran = new Random();
         vertx.setPeriodic(5000, hd -> {
             obj.setSignalName("vertx.test" + ran.nextInt(5));
-            System.out.println("Write to " + obj.getSignalName());
-            vertx.eventBus().send("tsdb.data", Json.encode(obj));
+            System.out.println("MAIN THREAD SEND: " + obj.getSignalName());
+            vertx.eventBus().publish("tsdb.data", Json.encode(obj));
         });
     }
 
@@ -92,7 +92,7 @@ public class VertxTsDbApp {
                 System.out.println("Warp10 Verticle deployed with id : " + verticleId);
             }).onFailure(e -> e.printStackTrace())
         ;
-        JsonObject fileTsdbConf = config.getJsonObject("warp10");
+        JsonObject fileTsdbConf = config.getJsonObject("tsdb-file");
         vertx
             .deployVerticle("test.vertx.tsdb.FileTsDbVerticle", new DeploymentOptions().setConfig(fileTsdbConf))
             .onSuccess(verticleId -> {

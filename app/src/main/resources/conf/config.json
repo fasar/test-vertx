@@ -20,9 +20,12 @@
         "port-ssl": 8443
     },
     "warp10" : {
-        "host-uri" : "http://localhost:9080/api/v0/streamupdate",
+        "host-uri" : "http://localhost:8080/api/v0/streamupdate",
         "reconnect-delay" : 5000,
         "warp10-token": "writeTokenCI",
         "debug-ws": false
+    },
+    "tsdb-file" : {
+        "config-file" : "conf/loggts.xml"
     }
 }

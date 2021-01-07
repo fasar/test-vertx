@@ -17,8 +17,6 @@ import test.vertx.utilities.Warp10Utils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Warp10Verticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(Warp10Verticle.class);
@@ -27,7 +25,6 @@ public class Warp10Verticle extends AbstractVerticle {
     private HttpClient client = null;
     private MessageConsumer<String> consumer = null;
 
-    private List<String> toWrite = new ArrayList<>();
 
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
@@ -37,14 +34,14 @@ public class Warp10Verticle extends AbstractVerticle {
         consumer = eventBus.consumer("tsdb.data", message -> {
             TsDbRecord tsDbRecord = Json.decodeValue(message.body(), TsDbRecord.class);
             String warp10WSMessage = Warp10Utils.convertTsDbRecordToWSGTS(tsDbRecord);
-            eventBus.request("tsdb.data.private", warp10WSMessage, options, ar -> {
-                if (ar.failed()) {
-                    toWrite.add(message.body());
-                    while (toWrite.size() > 10000) {
-                        toWrite.remove(0);
-                    }
-                }
-            });
+            eventBus.request("tsdb.data.private", warp10WSMessage, options);
+        });
+        consumer.completionHandler(ar -> {
+            if (ar.failed()) {
+                startPromise.fail(ar.cause());
+            } else {
+                startPromise.complete();
+            }
         });
     }
 
@@ -53,6 +50,7 @@ public class Warp10Verticle extends AbstractVerticle {
     public void stop(Promise<Void> stopPromise) throws Exception {
         if (consumer != null) {
             consumer.unregister();
+            consumer = null;
         }
         if (client != null) {
             client.close(ar -> {
@@ -63,6 +61,8 @@ public class Warp10Verticle extends AbstractVerticle {
                     stopPromise.fail(ar.cause());
                 }
             });
+        } else {
+            stopPromise.complete();
         }
     }
 
@@ -87,7 +87,7 @@ public class Warp10Verticle extends AbstractVerticle {
                     WebSocket ws = res.result();
                     ws.frameHandler(hdl -> {
                         if (hdl.isText()) {
-                            LOG.info("Warp10 return message : {}", hdl.textData());
+                            LOG.debug("Warp10 return message : {}", hdl.textData());
                         }
                     });
                     ws.closeHandler(hdl -> {
@@ -100,17 +100,10 @@ public class Warp10Verticle extends AbstractVerticle {
                     writeWS(ws, tokenMessage);
                     // Listen event to write on Warp10 WS
                     vertx.eventBus().<String>consumer("tsdb.data.private", message -> {
-                        LOG.info("Write data in Warp10 websocket: {}", message.body());
+                        LOG.trace("Write data in Warp10 websocket: {}", message.body());
                         writeWS(ws, message.body());
                         message.reply("ok");
                     });
-
-                    // Replay event not sent
-                    List<String> tmp = toWrite;
-                    toWrite = new ArrayList<>();
-                    for (String tsDbRecord : tmp) {
-                        vertx.eventBus().publish("tsdb.data", tsDbRecord);
-                    }
 
                     LOG.info("Websocked Connected on {}", hostUri);
                 } else {

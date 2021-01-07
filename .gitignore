@@ -49,3 +49,7 @@ nbdist/
 
 ### Jar files
 **/*.jar
+
+## Warp10 Docker data
+src/main/docker/w10-data
+
