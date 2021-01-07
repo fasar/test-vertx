@@ -27,5 +27,10 @@
     },
     "tsdb-file" : {
         "config-file" : "conf/loggts.xml"
+    },
+    "weather-scrapper": {
+        "cities-names": ["Annecy", "Geneve", "Lyon", "Canberra", "Bangalore", "Kuala Lumpur", "Doha", "Sydney", "Bangkok"],
+        "cities-anagrams": ["LFLP", "LSGG", "LFLL", "YSCB", "VOBL", "WMKK", "OTBD", "SYHD", "VTBD"],
+        "nb-days" : 1
     }
 }
