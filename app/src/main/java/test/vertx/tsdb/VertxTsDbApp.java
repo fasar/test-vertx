@@ -2,21 +2,18 @@ package test.vertx.tsdb;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
+import test.vertx.utils.VertxUtils;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class VertxTsDbApp {
 
@@ -26,47 +23,10 @@ public class VertxTsDbApp {
         DatabindCodec.mapper().registerModule(module);
         DatabindCodec.prettyMapper().registerModule(module);
 
-
         Vertx vertx = Vertx.vertx();
-        ConfigStoreOptions fileStore = new ConfigStoreOptions()
-            .setType("file")
-            .setConfig(new JsonObject().put("path", "conf/config.json"));
-
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-            .setScanPeriod(1000)
-            .addStore(fileStore);
-
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-
-        // Force to read configuration
-        retriever.getConfig(ar -> {
-            if (ar.failed()) {
-                // Failed to retrieve the configuration
-                ar.cause().printStackTrace();
-            } else {
-                JsonObject config = ar.result();
-                System.out.println("Loaded Config is : " + config);
-            }
-        });
-
+        ConfigRetriever retriever = VertxUtils.loadConfiguration(vertx);
         retriever.configStream()
-            .endHandler(v -> {
-                // retriever closed
-                System.out.println("Configuration closed ");
-            })
-            .exceptionHandler(t -> {
-                // an error has been caught while retrieving the configuration
-                System.out.println("Configuration error ");
-                t.printStackTrace();
-            })
             .handler(conf -> {
-                // the configuration
-                System.out.println("Configuration changed:" + conf);
-                System.out.println("Terminate verticles");
-                List<Future<Void>> toWait = vertx.deploymentIDs().stream().map(vertx::undeploy).collect(Collectors.toList());
-                System.out.println(toWait.size() + " verticles ended");
-                System.out.println("Starting verticles");
                 startVerticles(vertx, conf);
             });
 

@@ -21,12 +21,12 @@ public class FileTsDbVerticle extends AbstractVerticle {
     @Override
     public void start(Promise<Void> startPromise) throws Exception {
         LoggerContext loggerContext = new LoggerContext();
-        FileSystem fs = vertx.fileSystem();
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(loggerContext);
         // Call context.reset() to clear any previous configuration, e.g. default
         // configuration. For multi-step configuration, omit calling context.reset().
         loggerContext.reset();
+        FileSystem fs = vertx.fileSystem();
         String configFilePath = config().getString("config-file");
         fs.readFile(configFilePath)
             // Configure the Logging service
@@ -62,7 +62,7 @@ public class FileTsDbVerticle extends AbstractVerticle {
                     startPromise.fail(hr.cause());
                 }
             });
-            // Set the result to fail or ok depending of the chain of the
+        // Set the result to fail or ok depending of the chain of the
 //            .result()
 //            .onComplete(asyncResult -> {
 //                startPromise.handle(asyncResult);
